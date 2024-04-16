@@ -1,12 +1,7 @@
 import UserType from "./Types/UserType.mjs";
+import userType from "./Types/UserType.mjs";
 import mockData from '../MOCK_DATA.json' assert {type: 'json'};
-import {
-    GraphQLInt,
-    GraphQLList,
-    GraphQLObjectType,
-    GraphQLSchema,
-    GraphQLString
-} from "graphql";
+import {GraphQLInt, GraphQLList, GraphQLObjectType, GraphQLSchema, GraphQLString} from "graphql";
 
 
 const rootQuery = new GraphQLObjectType({
@@ -26,9 +21,24 @@ const rootQuery = new GraphQLObjectType({
                 const UserId = args.id;
                 return mockData.find(user => user.id === UserId)
             }
+        },
+        getPaginated:{
+            type:new GraphQLList(userType),
+            args:{
+                page:{type:GraphQLInt},
+                pageSize:{type: GraphQLInt},
+            },
+            resolve(parent,args){
+                let page = args.page;
+                let pageSize = args.pageSize;
+                const startIndex = (page-1)*(pageSize)
+                const endIndex = startIndex+pageSize
+                return mockData.slice(startIndex, endIndex)
+            }
         }
-    }
+    },
 })
+
 const Mutation = new GraphQLObjectType({
     name: 'Mutation',
     fields: {
